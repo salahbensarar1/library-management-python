@@ -1,4 +1,5 @@
 from app.models.member import Member
+
 from app.models.book import Book
 class Library:
     def __init__(self):
@@ -33,3 +34,25 @@ class Library:
         new_book = Book(book_id, title, author)
         self.books.append(new_book)
         return new_book
+    def borrow_book(self,member_id, book_id):
+        if self.find_member(member_id) == None or self.find_book(book_id) == None:
+            return False
+        book = self.find_book(book_id)
+        member = self.find_member(member_id)
+        if book.borrower_id is not None or member.borrowed_books_count >= 3 :
+            return False
+        else:
+            book.borrower_id = member.member_id
+            member.borrowed_books_count += 1
+            return True
+
+    def return_book(self,book_id):
+        Book = self.find_book(book_id)
+
+        if self.find_book(book_id) == None or Book.borrower_id is None:
+            return False
+        member = self.find_member(Book.borrower_id)
+        print("Book has been returned from :", member.member_id)
+        Book.borrower_id = None
+        member.borrowed_books_count -=1
+        return True
